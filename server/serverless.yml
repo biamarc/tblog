@@ -73,7 +73,7 @@ functions:
           authorizer: Auth
           documentation:
             summary: "Get all travels owned by a user"
-            description: "Tha API allow to retrieve all the travel items created by logged user"
+            description: "The API allow to retrieve all the travel items created by logged user"
     iamRoleStatements:
       - Effect: "Allow"
         Action:
@@ -95,7 +95,7 @@ functions:
               application/json:  ${file(validators/create-travel-request.json)}
           documentation:
             summary: "Create a new travel"
-            description: "Tha API allow to create new travel owned by logged user"
+            description: "The API allow to create new travel owned by logged user"
     iamRoleStatements:
       - Effect: "Allow"
         Action:
@@ -127,7 +127,7 @@ functions:
               application/json:  ${file(validators/update-travel-request.json)}
           documentation:
             summary: "Update an existing travel"
-            description: "Tha API allow to update existing travel owned by logged user"
+            description: "The API allow to update existing travel owned by logged user"
     iamRoleStatements:
       - Effect: "Allow"
         Action:
@@ -145,6 +145,9 @@ functions:
           path: auth/travels/{travelId}
           cors: true
           authorizer: Auth
+          documentation:
+            summary: "Delete an existing travel"
+            description: "The API allow to delete existing travel owned by logged user"
     iamRoleStatements:
       - Effect: "Allow"
         Action:
@@ -167,6 +170,9 @@ functions:
           path: auth/travels/{travelId}/attachment
           cors: true
           authorizer: Auth
+          documentation:
+            summary: "Generate a pre-signed url"
+            description: "The API allow to generate pre-signed url used to upload an image for a travel"
     iamRoleStatements:
       - Effect: "Allow"
         Action:

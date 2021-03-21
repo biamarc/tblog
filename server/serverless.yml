@@ -1,0 +1,340 @@
+service:  serverless-tblog
+
+plugins:
+  - serverless-webpack
+  - serverless-aws-documentation
+  - serverless-iam-roles-per-function
+
+package:
+  individually: true
+
+frameworkVersion: '2'
+
+provider:
+  name: aws
+  runtime: nodejs14.x
+  lambdaHashingVersion: 20201221
+
+  stage: ${opt:stage, 'dev'}
+  region: ${opt:region, 'eu-south-1'}
+
+  # AWS profile used to deploy application
+  profile: serverless
+
+  apiGateway:
+    shouldStartNameWithService: true
+
+  tracing:
+    lambda: true
+    apiGateway: true
+
+  environment:
+    DEPLOY_REGION: ${self:provider.region}
+    TRAVELS_TABLE: Travels-${self:provider.stage}
+    TRAVELS_USER_ID_INDEX: UserIdIndex
+    TRAVELS_ID_INDEX: TravelIdIndex
+    TRAVELS_IMAGES_S3_BUCKET: tblog-xxx755315zzz-images-${self:provider.stage}
+    SIGNED_URL_EXPIRATION: 300
+
+  # Global IAM role that must be included in any lambda to allow tracing
+  iamRoleStatements:
+    - Effect: "Allow"
+      Action:
+        - xray:PutTelemetryRecords
+        - xray:PutTraceSegments
+      Resource: "*"
+
+custom:
+  serverless-iam-roles-per-function:
+    defaultInherit: true
+
+  topicName: travelsTopic-${self:provider.stage}
+
+  documentation:
+    api:
+      info:
+        version: v1.0.0
+        title: Travels Blog Application API
+        description: A community for every travel that want to share his experience
+
+functions:
+  # authorization function
+  Auth:
+    handler: src/lambda/auth/auth0Authorizer.handler
+
+  # get all travels owned by a user
+  GetTravels:
+    handler: src/lambda/http/auth/getTravels.handler
+    events:
+      - http:
+          path: auth/travels
+          method: get
+          cors: true
+          authorizer: Auth
+          documentation:
+            summary: "Get all travels owned by a user"
+            description: "Tha API allow to retrieve all the travel items created by logged user"
+    iamRoleStatements:
+      - Effect: "Allow"
+        Action:
+          - dynamodb:Query
+        Resource:
+          arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TRAVELS_TABLE}/index/${self:provider.environment.TRAVELS_USER_ID_INDEX}
+
+  # create a travel for auth user
+  CreateTravel:
+    handler: src/lambda/http/auth/createTravel.handler
+    events:
+      - http:
+          method: post
+          path: auth/travels
+          cors: true
+          authorizer: Auth
+          request:
+            schema:
+              application/json:  ${file(validators/create-travel-request.json)}
+          documentation:
+            summary: "Create a new travel"
+            description: "Tha API allow to create new travel owned by logged user"
+    iamRoleStatements:
+      - Effect: "Allow"
+        Action:
+          - dynamodb:PutItem
+        Resource:
+          arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TRAVELS_TABLE}
+      - Effect: "Allow"
+        Action:
+          - s3:GetBucketLocation
+        Resource:
+          arn:aws:s3:::${self:provider.environment.TRAVELS_IMAGES_S3_BUCKET}
+      - Effect: "Allow"
+        Action:
+          - s3:PutObject
+        Resource:
+          arn:aws:s3:::${self:provider.environment.TRAVELS_IMAGES_S3_BUCKET}/*
+
+  # update travel owned by auth user
+  UpdateTravel:
+    handler: src/lambda/http/auth/updateTravel.handler
+    events:
+      - http:
+          method: patch
+          path: auth/travels/{travelId}
+          cors: true
+          authorizer: Auth
+          request:
+            schema:
+              application/json:  ${file(validators/update-travel-request.json)}
+          documentation:
+            summary: "Update an existing travel"
+            description: "Tha API allow to update existing travel owned by logged user"
+    iamRoleStatements:
+      - Effect: "Allow"
+        Action:
+          - dynamodb:GetItem
+          - dynamodb:UpdateItem
+        Resource:
+          arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TRAVELS_TABLE}
+
+  # delete a travel
+  DeleteTravel:
+    handler: src/lambda/http/auth/deleteTravel.handler
+    events:
+      - http:
+          method: delete
+          path: auth/travels/{travelId}
+          cors: true
+          authorizer: Auth
+    iamRoleStatements:
+      - Effect: "Allow"
+        Action:
+          - dynamodb:GetItem
+          - dynamodb:DeleteItem
+        Resource:
+          arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TRAVELS_TABLE}
+      - Effect: "Allow"
+        Action:
+          - s3:DeleteObject
+        Resource:
+          arn:aws:s3:::${self:provider.environment.TRAVELS_IMAGES_S3_BUCKET}/*
+
+  # generate a pre-signed url to publish an image of the travel
+  GenerateUploadUrl:
+    handler: src/lambda/http/auth/generateUploadUrl.handler
+    events:
+      - http:
+          method: post
+          path: auth/travels/{travelId}/attachment
+          cors: true
+          authorizer: Auth
+    iamRoleStatements:
+      - Effect: "Allow"
+        Action:
+          - dynamodb:GetItem
+        Resource:
+          arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TRAVELS_TABLE}
+      - Effect: "Allow"
+        Action:
+          - s3:PutObject
+        Resource:
+          arn:aws:s3:::${self:provider.environment.TRAVELS_IMAGES_S3_BUCKET}/*
+
+  # synchronize an uploaded image to travel
+  SyncTravelWithImage:
+    handler: src/lambda/s3/syncTravelWithImage.handler
+    events:
+      - sns:
+          arn:
+            Fn::Join:
+              - ':'
+              - - arn:aws:sns
+                - Ref: AWS::Region
+                - Ref: AWS::AccountId
+                - ${self:custom.topicName}
+          topicName: ${self:custom.topicName}
+    iamRoleStatements:
+      - Effect: "Allow"
+        Action:
+          - dynamodb:UpdateItem
+          - dynamodb:GetItem
+        Resource:
+          arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TRAVELS_TABLE}
+      - Effect: "Allow"
+        Action:
+          - dynamodb:Query
+        Resource:
+          arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TRAVELS_TABLE}/index/${self:provider.environment.TRAVELS_ID_INDEX}
+      - Effect: "Allow"
+        Action:
+          - s3:GetBucketLocation
+        Resource:
+          arn:aws:s3:::${self:provider.environment.TRAVELS_IMAGES_S3_BUCKET}
+
+resources:
+  Resources:
+
+    GatewayResponseDefault4XX:
+      Type: AWS::ApiGateway::GatewayResponse
+      Properties:
+        ResponseParameters:
+          gatewayresponse.header.Access-Control-Allow-Origin: "'*'"
+          gatewayresponse.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+          gatewayresponse.header.Access-Control-Allow-Methods: "'GET,OPTIONS,POST,PATCH,DELETE'"
+        ResponseType: DEFAULT_4XX
+        RestApiId:
+          Ref: ApiGatewayRestApi
+
+    GatewayResponseDefault5XX:
+      Type: AWS::ApiGateway::GatewayResponse
+      Properties:
+        ResponseParameters:
+          gatewayresponse.header.Access-Control-Allow-Origin: "'*'"
+          gatewayresponse.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+          gatewayresponse.header.Access-Control-Allow-Methods: "'GET,OPTIONS,POST,PATCH,DELETE'"
+        ResponseType: DEFAULT_5XX
+        RestApiId:
+          Ref: ApiGatewayRestApi
+
+    RequestTravelValidator:
+      Type: AWS::ApiGateway::RequestValidator
+      Properties:
+        Name: 'request-travel-validator'
+        RestApiId:
+          Ref: ApiGatewayRestApi
+        ValidateRequestBody: true
+        ValidateRequestParameters: false
+
+    TravelsImagesBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${self:provider.environment.TRAVELS_IMAGES_S3_BUCKET}
+        NotificationConfiguration:
+          TopicConfigurations:
+            - Event: s3:ObjectCreated:Put
+              Topic: !Ref TravelsTopic
+        CorsConfiguration:
+          CorsRules:
+            - AllowedOrigins:
+                - '*'
+              AllowedHeaders:
+                - '*'
+              AllowedMethods:
+                - GET
+                - PUT
+                - POST
+                - DELETE
+                - HEAD
+              MaxAge: 3000
+
+    TravelsImagesBucketPolicy:
+      Type: AWS::S3::BucketPolicy
+      Properties:
+        PolicyDocument:
+          Id: TravelsImagesPolicy
+          Version: "2012-10-17"
+          Statement:
+            - Sid: PublicReadForGetBucketObjects
+              Effect: Allow
+              Principal: '*'
+              Action: 's3:GetObject'
+              Resource: 'arn:aws:s3:::${self:provider.environment.TRAVELS_IMAGES_S3_BUCKET}/*'
+        Bucket: !Ref TravelsImagesBucket
+
+
+    TravelsDynamoDBTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: travelId
+            AttributeType: S
+          - AttributeName: userId
+            AttributeType: S
+          - AttributeName: createdAt
+            AttributeType: S
+        KeySchema:
+          - AttributeName: userId
+            KeyType: HASH
+          - AttributeName: travelId
+            KeyType: RANGE
+        BillingMode: PAY_PER_REQUEST
+        TableName: ${self:provider.environment.TRAVELS_TABLE}
+        GlobalSecondaryIndexes:
+          - IndexName: ${self:provider.environment.TRAVELS_USER_ID_INDEX}
+            KeySchema:
+              - AttributeName: userId
+                KeyType: HASH
+              - AttributeName: createdAt
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+          - IndexName: ${self:provider.environment.TRAVELS_ID_INDEX}
+            KeySchema:
+              - AttributeName: travelId
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+
+    TravelsTopic:
+      Type: AWS::SNS::Topic
+      Properties:
+        DisplayName: Travels topic
+        TopicName: ${self:custom.topicName}
+
+    SNSTopicPolicy:
+      Type: AWS::SNS::TopicPolicy
+      Properties:
+        Topics:
+          - !Ref TravelsTopic
+        PolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Principal:
+                AWS: "*"
+              Action: sns:Publish
+              Resource:
+                !Ref TravelsTopic
+              Condition:
+                ArnLike:
+                  AWS:SourceArn: arn:aws:s3:::${self:provider.environment.TRAVELS_IMAGES_S3_BUCKET}
+

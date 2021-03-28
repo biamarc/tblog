@@ -5,7 +5,7 @@
       <q-item>
         <q-item-section avatar>
           <q-avatar>
-            <img :src="$auth.user.picture">
+            <img :src="$auth.user.picture" alt="Profile picture">
           </q-avatar>
         </q-item-section>
 

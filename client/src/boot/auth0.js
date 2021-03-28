@@ -128,6 +128,27 @@ export const useAuth0 = ({
   return instance;
 };
 
-export default async ({ Vue } ) => {
-  Vue.prototype.$auth = useAuth0(options);
+export default async ({ Vue, router } ) => {
+  const auth0 = useAuth0(options);
+  Vue.prototype.$auth = auth0;
+
+  router.beforeEach((to, from, next) => {
+    console.log('Enter navigation guard')
+    if (to.matched.some(record => record.meta.requiresAuth)) {
+      // console.log('Request a protected url')
+      const loggedIn = auth0.isAuthenticated
+      // console.log('User is logged?: ' + loggedIn)
+      if (!loggedIn) {
+        // console.log('Redirect to login')
+        next({ path: '/' })
+      } else {
+        // console.log('Proceed to protected url')
+        next()
+      }
+    } else {
+      // console.log('Normal navigation')
+      next()
+    }
+  })
+
 }

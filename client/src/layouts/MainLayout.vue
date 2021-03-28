@@ -4,7 +4,6 @@
       <q-toolbar>
         <q-btn
           flat
-          dense
           round
           icon="menu"
           aria-label="Menu"
@@ -16,23 +15,48 @@
         </q-toolbar-title>
         <q-space />
 
-        <q-separator dark vertical />
-        <q-btn stretch flat label="Home" to="/" />
-        <q-separator dark vertical />
+        <q-btn stretch flat label="Home" :to="routes.HOME.path" />
         <q-btn stretch flat label="Board" />
-        <q-separator dark vertical />
         <div v-if="!$auth.loading">
           <!-- show login when not authenticated -->
           <q-btn v-if="!$auth.isAuthenticated"  stretch flat label="Login" icon="login" @click="login"/>
           <!-- show logout when authenticated -->
             <q-btn-dropdown  v-if="$auth.isAuthenticated"
-              color="primary"
-              unelevated
+              stretch flat
               label="Account"
               icon="account_circle"
             >
-              <q-btn stretch flat label="Profile" icon="account_circle" to="/profile"/>
-              <q-btn stretch flat label="Logout" icon="logout" @click="logout"/>
+              <q-list>
+                <q-item clickable  :to="routes.MY_TRAVELS.path">
+                  <q-item-section>
+                    <q-avatar icon="travel_explore"/>
+                  </q-item-section>
+                  <q-item-section>
+                    <q-item-label>Travels</q-item-label>
+                  </q-item-section>
+                </q-item>
+                <q-item clickable  :to="routes.PROFILE.path">
+                  <q-item-section>
+                    <q-avatar icon="account_circle"/>
+                  </q-item-section>
+                  <q-item-section>
+                    <q-item-label>Profile</q-item-label>
+                  </q-item-section>
+                </q-item>
+                <q-item clickable  @click="logout">
+                  <q-item-section>
+                    <q-avatar icon="logout"/>
+                  </q-item-section>
+                  <q-item-section>
+                    <q-item-label>Logout</q-item-label>
+                  </q-item-section>
+                </q-item>
+
+              </q-list>
+<!--              <q-btn stretch flat label="Profile" icon="account_circle" :to="routes.PROFILE.path"/>-->
+<!--              <q-btn stretch flat label="Logout" icon="logout" @click="logout"/>-->
+<!--              <q-btn stretch flat label="My Travels" icon="world" :to="routes.MY_TRAVELS.path"/>-->
+
             </q-btn-dropdown>
 
         </div>
@@ -81,7 +105,7 @@
 
 <script>
 import EssentialLink from 'components/EssentialLink.vue'
-
+import {AppRoutes} from '../models/path_constants'
 const linksData = [
   {
     title: 'Docs',
@@ -134,6 +158,11 @@ export default {
     return {
       leftDrawerOpen: false,
       essentialLinks: linksData
+    }
+  },
+  computed: {
+    routes (){
+      return AppRoutes;
     }
   },
   methods: {

@@ -1,11 +1,15 @@
+import {AppRoutes} from '../models/path_constants'
 
 const routes = [
   {
     path: '/',
     component: () => import('layouts/MainLayout.vue'),
     children: [
-      { path: '', component: () => import('pages/Index.vue') },
-      { path: '/profile', component: ()=> import('pages/profile.vue') }
+      { path: '', component: () => import('pages/Index.vue') , meta: { requiresAuth: false }},
+
+      { path: AppRoutes.PROFILE.path, component: ()=> import('pages/Profile.vue') , meta: { requiresAuth: true }},
+      { path: AppRoutes.MY_TRAVELS.path, component: ()=> import('pages/MyTravels.vue'), meta: { requiresAuth: true } }
+
     ]
   },
 

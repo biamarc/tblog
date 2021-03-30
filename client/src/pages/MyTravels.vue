@@ -1,7 +1,9 @@
 <template>
   <q-page padding>
     <h1>My Travels</h1>
-      <p>{{ token }}</p>
+    <h3>List</h3>
+    <q-btn @click="list()" label="List"/>
+    <br/>
   </q-page>
 </template>
 
@@ -10,17 +12,22 @@ export default {
   name: 'MyTravels',
   data () {
     return {
-      token: null
+      token: null,
+      client:  null
     }
   },
-  created() {
-    this.getJWTToken();
+  async created() {
+    this.token = await this.$auth.getJWTToken()
+    this.client = this.$axios.buildAuth(this.token);
   },
   methods: {
-    getJWTToken() {
-      this.$auth.getIdTokenClaims()
-        .then((val) => this.token = val.__raw)
+    list() {
+      this.client.get('/auth/travels')
+        .then(res => console.info(`Result: ${res}`))
+        .catch(err => console.error(`Error: ${err}`))
+        .finally(() => console.info('End'))
     }
+
   }
 
 }

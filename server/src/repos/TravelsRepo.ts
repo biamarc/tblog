@@ -15,9 +15,9 @@ export class TravelsRepo {
 
     constructor(
         private readonly docClient: DocumentClient = createDynamoDBClient(),
-        private readonly travelTable = process.env.TRAVEL_TABLE,
-        private readonly userIdIndex = process.env.TRAVEL_USER_ID_INDEX,
-        private readonly travelIdIndex = process.env.TRAVEL_ID_INDEX
+        private readonly travelTable = process.env.TRAVELS_TABLE,
+        private readonly userIdIndex = process.env.TRAVELS_USER_ID_INDEX,
+        private readonly travelIdIndex = process.env.TRAVELS_ID_INDEX
     ) {
     }
 

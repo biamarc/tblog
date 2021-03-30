@@ -80,6 +80,18 @@ export const useAuth0 = ({
       getTokenSilently(o) {
         return this.auth0Client.getTokenSilently(o);
       },
+      /** Extract JWT token **/
+      async getJWTToken(o) {
+        let token = await this.auth0Client.getIdTokenClaims(o);
+        if (token){
+          return token.__raw;
+        }
+        // refresh token or re-login
+        await this.auth0Client.getTokenSilently(o)
+        token = await this.auth0Client.getIdTokenClaims(o);
+        return token && token.__raw
+      },
+
       /** Gets the access token using a popup window */
 
       getTokenWithPopup(o) {

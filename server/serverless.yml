@@ -81,6 +81,25 @@ functions:
         Resource:
           arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TRAVELS_TABLE}/index/${self:provider.environment.TRAVELS_USER_ID_INDEX}
 
+  # get single travel owned by user
+  GetTravel:
+    handler: src/lambda/http/auth/getTravel.handler
+    events:
+      - http:
+          path: auth/travels/{travelId}
+          method: get
+          cors: true
+          authorizer: Auth
+          documentation:
+            summary: "Get a travel owned by a user"
+            description: "The API allow to retrieve a single travel created by logged user"
+    iamRoleStatements:
+      - Effect: "Allow"
+        Action:
+          - dynamodb:GetItem
+        Resource:
+          arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TRAVELS_TABLE}
+
   # create a travel for auth user
   CreateTravel:
     handler: src/lambda/http/auth/createTravel.handler

@@ -36,5 +36,5 @@
     "startDate",
     "endDate"
   ],
-  "additionalProperties": false
+  "additionalProperties": true
 }

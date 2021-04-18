@@ -21,7 +21,9 @@ module.exports = function (/* ctx */) {
     // https://v1.quasar.dev/quasar-cli/boot-files
     boot: [
       'axios',
-      'auth0'
+      'auth0',
+      'components',
+      'notifier'
 
     ],
 
@@ -98,7 +100,9 @@ module.exports = function (/* ctx */) {
       // directives: [],
 
       // Quasar plugins
-      plugins: []
+      plugins: [
+        'Notify'
+      ]
     },
 
     // animations: 'all', // --- includes all animations

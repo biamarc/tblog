@@ -8,7 +8,9 @@ const routes = [
       { path: '', component: () => import('pages/Index.vue') , meta: { requiresAuth: false }},
 
       { path: AppRoutes.PROFILE.path, component: ()=> import('pages/Profile.vue') , meta: { requiresAuth: true }},
-      { path: AppRoutes.MY_TRAVELS.path, component: ()=> import('pages/MyTravels.vue'), meta: { requiresAuth: true } }
+      { path: AppRoutes.MY_TRAVELS.path, component: ()=> import('pages/ListMyTravels.vue'), meta: { requiresAuth: true } },
+      { path: AppRoutes.MY_TRAVELS.path+'/:travelId', component: ()=> import('pages/MyTravelsForm'), meta: { requiresAuth: true }, props: true },
+      { path: AppRoutes.NEW_TRAVEL.path, component: ()=> import('pages/MyTravelsForm'), meta: { requiresAuth: true }}
 
     ]
   },

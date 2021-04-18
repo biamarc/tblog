@@ -145,13 +145,13 @@ export default async ({ Vue, router } ) => {
   Vue.prototype.$auth = auth0;
 
   router.beforeEach((to, from, next) => {
-    console.log('Enter navigation guard')
+    // console.log('Enter navigation guard')
     if (to.matched.some(record => record.meta.requiresAuth)) {
       // console.log('Request a protected url')
       const loggedIn = auth0.isAuthenticated
       // console.log('User is logged?: ' + loggedIn)
       if (!loggedIn) {
-        // console.log('Redirect to login')
+        // console.log('Redirect to home')
         next({ path: '/' })
       } else {
         // console.log('Proceed to protected url')

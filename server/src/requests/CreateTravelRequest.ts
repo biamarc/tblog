@@ -6,4 +6,5 @@ export interface CreateTravelRequest {
   description: string
   startDate: string
   endDate: string
+  published: boolean
 }

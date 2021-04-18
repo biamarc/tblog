@@ -29,7 +29,7 @@ export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEven
     // delete object
     await deleteTravel(userId, travelId)
 
-    if (travelItem.attachmentUrl) {
+    if (travelItem.imageUrl) {
       // remove image associated to the todoItem if exists
       await removeImage(travelId)
     }

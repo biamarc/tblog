@@ -155,6 +155,29 @@ functions:
         Resource:
           arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TRAVELS_TABLE}
 
+  # publish or unpublish a travel owned by auth user
+  PublishTravel:
+    handler: src/lambda/http/auth/publishTravel.handler
+    events:
+      - http:
+          method: patch
+          path: auth/travels/{travelId}/publish
+          cors: true
+          authorizer: Auth
+          request:
+            schema:
+              application/json:  ${file(validators/publish-travel-request.json)}
+          documentation:
+            summary: "Publish or unpublish an existing travel"
+            description: "The API allow to publish or unpublish existing travel owned by logged user"
+    iamRoleStatements:
+      - Effect: "Allow"
+        Action:
+          - dynamodb:GetItem
+          - dynamodb:UpdateItem
+        Resource:
+          arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TRAVELS_TABLE}
+
   # delete a travel
   DeleteTravel:
     handler: src/lambda/http/auth/deleteTravel.handler

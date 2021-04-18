@@ -3,6 +3,18 @@
   "title": "createTravel",
   "type": "object",
   "properties": {
+    "travelId": {
+      "type": "string",
+      "description": "Id of the travel"
+    },
+    "published": {
+      "type": "boolean",
+      "description": "If true publish the travel while false remove it from publication"
+    },
+    "imageUrl": {
+      "type": "string",
+      "description": "Url to view image"
+    },
     "name": {
       "type": "string",
       "description": "The simple name of the travel",
@@ -36,5 +48,5 @@
     "startDate",
     "endDate"
   ],
-  "additionalProperties": true
+  "additionalProperties": false
 }

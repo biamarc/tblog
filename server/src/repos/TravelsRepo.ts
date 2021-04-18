@@ -11,7 +11,7 @@ import GetItemOutput = DocumentClient.GetItemOutput;
 const MAX_ITEMS_PER_PAGE = 100;
 
 export class TravelsRepo {
-    private logger = createLogger('todoRepos')
+    private logger = createLogger('travelRepos')
 
     constructor(
         private readonly docClient: DocumentClient = createDynamoDBClient(),
@@ -94,12 +94,16 @@ export class TravelsRepo {
                 userId: obj.userId,
                 travelId: obj.travelId
             },
-            UpdateExpression: "set name=:name, description=:description, startDate=:startDate, endDate=:endDate",
+            UpdateExpression: "set #name=:name, description=:description, startDate=:startDate, endDate=:endDate, published=:published",
+            ExpressionAttributeNames: {
+                "#name": 'name'
+            },
             ExpressionAttributeValues: {
                 ":name": obj.name,
                 ":description": obj.description,
                 ":startDate": obj.startDate,
-                ":endDate": obj.endDate
+                ":endDate": obj.endDate,
+                ":published": obj.published
             },
         }).promise()
 
@@ -116,7 +120,7 @@ export class TravelsRepo {
             TableName: this.travelTable,
             Key: {
                 userId: obj.userId,
-                todoId: obj.travelId
+                travelId: obj.travelId
             }
         }).promise()
     }
@@ -131,11 +135,11 @@ export class TravelsRepo {
             TableName: this.travelTable,
             Key: {
                 userId: travel.userId,
-                todoId: travel.travelId
+                travelId: travel.travelId
             },
-            UpdateExpression: "set attachmentUrl = :attachmentUrl",
+            UpdateExpression: "set imageUrl = :imageUrl",
             ExpressionAttributeValues: {
-                ":attachmentUrl": url
+                ":imageUrl": url
             },
         }).promise()
     }

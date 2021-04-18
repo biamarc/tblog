@@ -9,6 +9,7 @@ export interface TravelResult {
   description: string
   startDate: string
   endDate: string
-  attachmentUrl?: string
+  published: boolean
+  imageUrl?: string
 }
 

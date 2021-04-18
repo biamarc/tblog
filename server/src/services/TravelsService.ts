@@ -5,6 +5,7 @@ import {genUUId} from "../utils/helper";
 import {UpdateTravelRequest} from "../requests/UpdateTravelRequest";
 import {TravelsPaged} from "../models/TravelsPaged";
 import {Pagination} from "../utils/pagination";
+import {PublishTravelRequest} from "../requests/PublishTravelRequest";
 
 const repo: TravelsRepo = new TravelsRepo()
 
@@ -31,9 +32,10 @@ export async function createTravel(userId: string, req: CreateTravelRequest): Pr
         name: req.name,
         description: req.description,
         startDate: req.startDate,
-        endDate: req.startDate,
+        endDate: req.endDate,
+        published: req.published,
         createdAt: new Date().toISOString(),
-        attachmentUrl: null
+        imageUrl: null
     }
     return repo.createTravel(obj)
 }
@@ -63,7 +65,24 @@ export async function updateTravel(userId: string, travelId: string, req: Update
     obj.description = req.description
     obj.startDate = req.startDate
     obj.endDate = req.endDate
+    obj.published = req.published
 
+    return repo.updateTravel(obj)
+}
+
+/**
+ * Publish or unpublish a travel if it's owned by user
+ * @param userId the user identifier
+ * @param travelId the pk identify the travel
+ * @param req the input parameter
+ * @return the travel modified
+ */
+export async function publishTravel(userId: string, travelId: string, req: PublishTravelRequest): Promise<TravelItem> {
+    const obj: TravelItem = await getTravel(userId, travelId)
+    if (!obj) {
+        return null
+    }
+    obj.published = req.published
     return repo.updateTravel(obj)
 }
 

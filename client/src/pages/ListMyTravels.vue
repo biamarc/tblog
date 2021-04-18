@@ -1,14 +1,14 @@
 <template>
   <q-page padding>
     <tb-title-page icon="travel_explore" title="My Travels">
-      <q-btn icon="add" color="primary" class="q-mx-md" :to="newTravel">New travel</q-btn>
+      <q-btn icon="add" color="primary" class="q-mx-md" :to="newTravel" :loading="loading">New travel</q-btn>
     </tb-title-page>
     <hr class="q-my-md"/>
     <div class="row items-start q-gutter-md">
       <tb-travel-view v-for="tr in travels" :key="tr.travelId" :travel="tr" @change="changed" @deleted="deleted"/>
     </div>
     <br/>
-    <q-btn v-if="nextKey" label="More" @click="more()" :loading="loadingMore"/>
+    <q-btn v-if="nextKey" label="More" @click="more()" :loading="loading"/>
   </q-page>
 </template>
 
@@ -23,7 +23,7 @@ export default {
       client:  null,
       travels: [],
       nextKey: null,
-      loadingMore: false
+      loading: false
     }
   },
   async created() {
@@ -38,6 +38,7 @@ export default {
   },
   methods: {
     list() {
+      this.loading = true
       this.client.get('/auth/travels')
         .then(res => {
           console.info(`Result: ${res}`)
@@ -45,9 +46,10 @@ export default {
             this.hasMore = res.data['nextKey']
           })
         .catch(() => this.$notifier.error('Error retrieving data'))
+        .finally(() => this.loading = false)
     },
     more() {
-      this.loadingMore = true
+      this.loading = true
       this.client.get(`/auth/travels?nextKey=${this.nextKey}`)
         .then(res => {
           console.info(`Result: ${res}`)
@@ -55,7 +57,7 @@ export default {
           this.netxKey = res.data['nextKey']
         })
         .catch(() => this.$notifier.error('Error retrieving data'))
-        .finally(() => this.loadingMore = false)
+        .finally(() => this.loading = false)
     },
     changed(value) {
       if (value) {

@@ -25,7 +25,7 @@
     <q-separator/>
      <q-card-actions align="right">
         <q-btn flat :icon="iconPublish" @click="togglePublish()" :loading="waitingAction">{{ labelPublish }}</q-btn>
-        <q-btn flat icon="edit" @click="editItem()">Edit</q-btn>
+        <q-btn flat icon="edit" @click="editItem()" :loading="waitingAction">Edit</q-btn>
         <q-btn flat icon="delete" @click="deleteItem()" :loading="waitingAction">Delete</q-btn>
      </q-card-actions>
   </q-card>

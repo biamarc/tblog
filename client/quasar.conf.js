@@ -23,8 +23,8 @@ module.exports = function (/* ctx */) {
       'axios',
       'auth0',
       'components',
-      'notifier'
-
+      'notifier',
+      'vuelidate'
     ],
 
     // https://v1.quasar.dev/quasar-cli/quasar-conf-js#Property%3A-css

@@ -2,8 +2,8 @@ import 'source-map-support/register'
 
 import {APIGatewayProxyEvent, APIGatewayProxyHandler, APIGatewayProxyResult} from 'aws-lambda'
 
-import {getUserId} from "../../utils";
-import {TravelItem} from "../../../models/TravelItem";
+import {getUserId, removeUserIdFromItem} from "../../utils";
+import {TravelItem, TravelResult} from "../../../models/TravelItem";
 import {getTravel} from "../../../services/TravelsService";
 import {createLogger} from "../../../utils/logger";
 
@@ -31,13 +31,13 @@ export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEven
             })
         }
     }
-
+    const travelResults: TravelResult = removeUserIdFromItem(travel)
     return {
         statusCode: 200,
         headers: {
             'Access-Control-Allow-Origin': '*',
             'Access-Control-Allow-Credentials': true
         },
-        body:  JSON.stringify(travel)
+        body:  JSON.stringify(travelResults)
     }
 }

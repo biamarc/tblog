@@ -12,7 +12,7 @@
       "description": "If true publish the travel while false remove it from publication"
     },
     "imageUrl": {
-      "type": "string",
+      "type": ["string","null"],
       "description": "Url to view image"
     },
     "name": {
@@ -48,5 +48,5 @@
     "startDate",
     "endDate"
   ],
-  "additionalProperties": false
+  "additionalProperties": true
 }

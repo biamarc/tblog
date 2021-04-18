@@ -61,7 +61,7 @@
       <q-btn label="Undo" icon="undo" :to="undo" :loading="loading"/>
     </div>
 
-    <div>{{ travel }}</div>
+<!--    <div>{{ travel }}</div>-->
   </div>
 </template>
 
@@ -108,7 +108,7 @@ export default {
   },
   watch: {
     travelId: {
-      handler: function (nv, ov) {
+      handler: function (nv) {
         this.getTravel(nv)
       }
     }
@@ -127,7 +127,7 @@ export default {
           .then(res => {
             this.travel = res.data
           })
-          .catch(err => this.$notifier.error('Unable to find your travel'))
+          .catch(() => this.$notifier.error('Unable to find your travel'))
       }
     },
     save() {
@@ -137,16 +137,15 @@ export default {
         return
       }
       this.loading = true
-      const obj = {
-        name: this.travel.name,
-        description: this.travel.description,
-        startDate: this.travel.startDate,
-        endDate: this.travel.endDate,
-        published: this.travel.published,
+      let execute = this.client.post;
+      let url = AppRoutes.MY_TRAVELS.path
+      if (this.travelId) {
+        execute = this.client.patch
+        url = `${url}/${this.travelId}`
       }
-      this.client.post('/auth/travels', obj)
-        .then(res => this.$router.push(AppRoutes.MY_TRAVELS.path))
-        .catch(err => this.$notifier.error('Error saving data'))
+      execute(url, this.travel)
+        .then(() => this.$router.push(AppRoutes.MY_TRAVELS.path))
+        .catch(() => this.$notifier.error('Error saving data'))
         .finally(() => this.loading = false)
     }
   }

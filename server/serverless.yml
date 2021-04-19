@@ -33,6 +33,7 @@ provider:
     TRAVELS_TABLE: Travels-${self:provider.stage}
     TRAVELS_USER_ID_INDEX: UserIdIndex
     TRAVELS_ID_INDEX: TravelIdIndex
+    TRAVELS_PUBLISHED_ID_INDEX: TravelPublishedIdIndex
     TRAVELS_IMAGES_S3_BUCKET: tblog-xxx755315zzz-images-${self:provider.stage}
     SIGNED_URL_EXPIRATION: 300
 
@@ -227,6 +228,24 @@ functions:
         Resource:
           arn:aws:s3:::${self:provider.environment.TRAVELS_IMAGES_S3_BUCKET}/*
 
+  # get all travels owned by a user
+  GetPublishedTravels:
+    handler: src/lambda/http/public/getPublishedTravels.handler
+    events:
+      - http:
+          path: travels
+          method: get
+          cors: true
+          documentation:
+            summary: "Get all published travels of all users"
+            description: "The API allow to retrieve all the published travels created by users"
+    iamRoleStatements:
+      - Effect: "Allow"
+        Action:
+          - dynamodb:Query
+        Resource:
+          arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TRAVELS_TABLE}/index/${self:provider.environment.TRAVELS_PUBLISHED_ID_INDEX}
+
   # synchronize an uploaded image to travel
   SyncTravelWithImage:
     handler: src/lambda/s3/syncTravelWithImage.handler
@@ -339,6 +358,8 @@ resources:
             AttributeType: S
           - AttributeName: createdAt
             AttributeType: S
+          - AttributeName: published
+            AttributeType: N
         KeySchema:
           - AttributeName: userId
             KeyType: HASH
@@ -361,6 +382,15 @@ resources:
                 KeyType: HASH
             Projection:
               ProjectionType: ALL
+          - IndexName: ${self:provider.environment.TRAVELS_PUBLISHED_ID_INDEX}
+            KeySchema:
+              - AttributeName: published
+                KeyType: HASH
+              - AttributeName: createdAt
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+
 
     TravelsTopic:
       Type: AWS::SNS::Topic

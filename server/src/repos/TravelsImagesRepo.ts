@@ -34,12 +34,25 @@ export class TravelsImagesRepo {
     }
 
     /**
-     * Create pre-signed url for S3 bucket
+     * Create pre-signed url for S3 bucket in order to upload object
      * @param travelId the pk identified the travel
      */
     getUploadUrl(travelId: string): string {
         this.logger.info('Get upload url for travelId: %s', travelId)
         return this.s3client.getSignedUrl('putObject', {
+            Bucket: this.travelsImagesBucket,
+            Key: travelId,
+            Expires: this.urlExpiration
+        })
+    }
+
+    /**
+     * Create pre-signed url for S3 bucket for getObject
+     * @param travelId the pk identified the travel
+     */
+    getDownloadUrl(travelId: string): string {
+        this.logger.info('Get download url for travelId: %s', travelId)
+        return this.s3client.getSignedUrl('getObject', {
             Bucket: this.travelsImagesBucket,
             Key: travelId,
             Expires: this.urlExpiration

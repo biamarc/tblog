@@ -20,6 +20,15 @@ export async function getAllTravels(userId: string, pagination?: Pagination): Pr
 }
 
 /**
+ * Return all published (public) travels
+ * @param pagination the pagination object
+ */
+export async function getAllPublishedTravels(pagination?: Pagination): Promise<TravelsPaged> {
+    return repo.getPublishedTravels(pagination)
+}
+
+
+/**
  * Create a Travel owned by the user
  * @param userId the user owned the travel
  * @param req the input parameters to create new travel

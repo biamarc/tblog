@@ -17,8 +17,10 @@ export class TravelsRepo {
         private readonly docClient: DocumentClient = createDynamoDBClient(),
         private readonly travelTable = process.env.TRAVELS_TABLE,
         private readonly userIdIndex = process.env.TRAVELS_USER_ID_INDEX,
-        private readonly travelIdIndex = process.env.TRAVELS_ID_INDEX
-    ) {
+        private readonly travelIdIndex = process.env.TRAVELS_ID_INDEX,
+        private readonly publishedTravelIndex = process.env.TRAVELS_PUBLISHED_ID_INDEX
+
+) {
     }
 
     /**
@@ -54,7 +56,34 @@ export class TravelsRepo {
             ExpressionAttributeValues: {
                 ":userIdValue": userId
             },
-            ScanIndexForward: true,
+            ScanIndexForward: false,
+            Limit: pagination ? pagination.limit : MAX_ITEMS_PER_PAGE,
+            ExclusiveStartKey: pagination ? pagination.nextKey : null,
+        };
+        this.logger.info('Query params: %s', JSON.stringify(queryInput));
+        const result: QueryOutput = await this.docClient.query(queryInput).promise();
+        return {
+            items: result.Items as TravelItem[],
+            nextKey: encodeNextKey(result.LastEvaluatedKey)
+        }
+    }
+
+    /**
+     * Return all the travel for a given user
+     * @param pagination the object used to scan and paginate the result
+     */
+    async getPublishedTravels(pagination?: Pagination): Promise<TravelsPaged> {
+        const queryInput: QueryInput = {
+            TableName: this.travelTable,
+            IndexName: this.publishedTravelIndex,
+            KeyConditionExpression: "#key = :published",
+            ExpressionAttributeNames: {
+                "#key": "published"
+            },
+            ExpressionAttributeValues: {
+                ":published": 1
+            },
+            ScanIndexForward: false,
             Limit: pagination ? pagination.limit : MAX_ITEMS_PER_PAGE,
             ExclusiveStartKey: pagination ? pagination.nextKey : null,
         };

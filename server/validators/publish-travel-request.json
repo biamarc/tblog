@@ -4,8 +4,10 @@
   "type": "object",
   "properties": {
     "published": {
-      "type": "boolean",
-      "description": "If true publish the travel while false remove it from publication"
+      "type": "integer",
+      "description": "If 1 publish the travel ; if 0 remove it from publication",
+      "minimum": 0,
+      "maximum": 1
     }
   },
   "required": [

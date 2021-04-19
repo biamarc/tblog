@@ -42,7 +42,6 @@ class CustomAxios {
    * @return {*}
    */
   buildAuth(token, config = {baseURL: this._baseUrl , timeout: 5000}) {
-    console.log(config)
     const instance = this.build(config)
     instance.interceptors.request.use(this.authHeader(token))
     return instance;

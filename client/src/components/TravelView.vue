@@ -1,9 +1,10 @@
 <template>
+  <div>
   <q-card>
     <q-img
-      v-if="travel.image"
-      :src="travel.image"
-      style="width:100%"
+      v-if="travel.imageUrl"
+      :src="travel.imageUrl"
+      style="width:100%; max-width: 600px"
     >
       <template v-slot:error>
         <div class="absolute-full flex flex-center bg-negative text-white">
@@ -26,9 +27,24 @@
      <q-card-actions align="right">
         <q-btn flat :icon="iconPublish" @click="togglePublish()" :loading="waitingAction">{{ labelPublish }}</q-btn>
         <q-btn flat icon="edit" @click="editItem()" :loading="waitingAction">Edit</q-btn>
-        <q-btn flat icon="delete" @click="deleteItem()" :loading="waitingAction">Delete</q-btn>
+        <q-btn flat icon="delete" @click="confirm()" :loading="waitingAction">Delete</q-btn>
      </q-card-actions>
   </q-card>
+
+    <q-dialog v-model="showDialog" persistent>
+      <q-card>
+        <q-card-section class="row items-center">
+          <q-avatar icon="help_outline" size="100px"/>
+          Confirm to delete your travel
+        </q-card-section>
+
+        <q-card-actions align="right">
+          <q-btn flat label="Cancel" color="default" v-close-popup />
+          <q-btn flat label="Delete the travel" color="danger" @click="deleteItem()"/>
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
+  </div>
 
 </template>
 <script>
@@ -44,7 +60,8 @@ export default {
   },
   data() {
     return {
-      waitingAction: false
+      waitingAction: false,
+      showDialog: false,
     }
   },
   async created() {
@@ -60,11 +77,15 @@ export default {
     }
   },
   methods: {
+    confirm() {
+      this.showDialog = true
+    },
     deleteItem() {
+      this.showDialog = false
       this.waitingAction=true
       this.client.delete(`/auth/travels/${this.travel.travelId}`)
-      .then(res => this.$emit('deleted',this.travel))
-      .catch(err => this.$notifier.error('An error occurred performing operation'))
+      .then(() => this.$emit('deleted',this.travel))
+      .catch(() => this.$notifier.error('An error occurred performing operation'))
       .finally(()=>this.waitingAction=false)
     },
     editItem() {
@@ -74,7 +95,7 @@ export default {
       this.waitingAction=true
       this.client.patch(`/auth/travels/${this.travel.travelId}/publish`, {published: !this.travel.published})
         .then(res => this.$emit('change',res.data))
-      .catch(err => this.$notifier.error('An error occurred performing operation'))
+      .catch(() => this.$notifier.error('An error occurred performing operation'))
       .finally(()=>this.waitingAction=false)
     }
   }

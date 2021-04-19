@@ -56,6 +56,18 @@
              :error-message="`Field must be not empty greater than ${$v.travel.description.$params.minLength.min} and lower than ${$v.travel.description.$params.maxLength.max} chars`"
     />
 
+    <q-img v-if="travel.imageUrl" src="travel.imageUrl"  style="width: 100%; max-width: 800px">
+      <template v-slot:loading>
+        <q-spinner-gears color="white" />
+      </template>
+    </q-img>
+
+    <q-file v-model="image" label="Image of your travel" accept=".jpg, image/*"  @rejected="onRejected">
+      <template v-slot:prepend>
+        <q-icon name="attach_file" />
+      </template>
+    </q-file>
+
     <div class="q-pt-lg q-gutter-x-md">
       <q-btn label="Save" icon="save" color="primary" @click="save" :loading="loading"/>
       <q-btn label="Undo" icon="undo" :to="undo" :loading="loading"/>
@@ -76,7 +88,8 @@ export default {
   data() {
     return {
       travel: new Travel(),
-      loading: false
+      loading: false,
+      image: null
     }
   },
   validations () {
@@ -122,15 +135,17 @@ export default {
     getTravel(tid) {
       console.log(`travelId: ${tid}`)
       if (tid) {
+        this.loading = true
         console.log('invoke client')
         this.client.get(`/auth/travels/${tid}`)
           .then(res => {
             this.travel = res.data
           })
           .catch(() => this.$notifier.error('Unable to find your travel'))
+          .finally(()=>this.loading = false)
       }
     },
-    save() {
+    async save() {
       this.$v.travel.$touch()
       if (this.$v.travel.$error) {
         this.$notifier.error('Please review fields before save.')
@@ -143,10 +158,30 @@ export default {
         execute = this.client.patch
         url = `${url}/${this.travelId}`
       }
-      execute(url, this.travel)
-        .then(() => this.$router.push(AppRoutes.MY_TRAVELS.path))
-        .catch(() => this.$notifier.error('Error saving data'))
-        .finally(() => this.loading = false)
+      try{
+        const res = await execute(url, this.travel)
+        // execute upload if image
+        if (this.image) {
+          try {
+            // generate pre-signed URL for authenticated user
+            const s3res = await this.client.post(`/auth/travels/${res.data.travelId}/attachment`)
+            console.log('Pre-signed-url: ', JSON.stringify(s3res))
+            // put image to S3
+            await this.$axios.build({timeout: 5000}).put(s3res.data.uploadUrl, this.image)
+          } catch (e) {
+            this.$notifier.error('Error uploading image')
+          }
+        }
+        await this.$router.push(AppRoutes.MY_TRAVELS.path)
+      } catch (e){
+        this.$notifier.error('Error saving data')
+      } finally {
+        this.loading = false
+      }
+    },
+    onRejected (rejectedEntries) {
+      console.log('Rejected entries',JSON.stringify(rejectedEntries))
+      this.$notifier.warning(`${rejectedEntries.length} file(s) did not pass validation constraints`)
     }
   }
 }

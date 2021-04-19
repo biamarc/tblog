@@ -6,7 +6,7 @@ class Travel {
     this.endDate=null
     this.name=null
     this.description=null
-    this.published=false
+    this.published=0
     this.imageUrl=null
   }
 
@@ -17,7 +17,7 @@ class Travel {
     return this.imageUrl !== null && this.imageUrl !== undefined
   }
   isPublished() {
-    return this.published
+    return this.published===1
   }
 
 }

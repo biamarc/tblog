@@ -1,6 +1,6 @@
 <template>
-  <div>
-  <q-card>
+  <div style="width: 100%">
+  <q-card >
     <q-img
       v-if="travel.imageUrl"
       :src="travel.imageUrl"
@@ -24,7 +24,7 @@
       {{ travel.description }}
     </q-card-section>
     <q-separator/>
-     <q-card-actions align="right">
+     <q-card-actions align="right" v-if="editable">
         <q-btn flat :icon="iconPublish" @click="togglePublish()" :loading="waitingAction">{{ labelPublish }}</q-btn>
         <q-btn flat icon="edit" @click="editItem()" :loading="waitingAction">Edit</q-btn>
         <q-btn flat icon="delete" @click="confirm()" :loading="waitingAction">Delete</q-btn>
@@ -33,14 +33,17 @@
 
     <q-dialog v-model="showDialog" persistent>
       <q-card>
-        <q-card-section class="row items-center">
-          <q-avatar icon="help_outline" size="100px"/>
-          Confirm to delete your travel
+        <q-card-section>
+          <q-avatar icon="help" color="primary" text-color="white" />
+          <span class="q-ml-sm">Confirm to delete your travel?</span>
         </q-card-section>
-
+        <q-card-section class="q-pt-none text-center">
+          {{travel.name}}
+        </q-card-section>
+        <q-separator/>
         <q-card-actions align="right">
           <q-btn flat label="Cancel" color="default" v-close-popup />
-          <q-btn flat label="Delete the travel" color="danger" @click="deleteItem()"/>
+          <q-btn flat label="Delete the travel" color="red" @click="deleteItem()"/>
         </q-card-actions>
       </q-card>
     </q-dialog>
@@ -56,6 +59,11 @@ export default {
     travel: {
       type: Object,
       required: true,
+    },
+    editable: {
+      type: Boolean,
+      required: false,
+      default: true
     }
   },
   data() {
@@ -65,8 +73,10 @@ export default {
     }
   },
   async created() {
-    this.token = await this.$auth.getJWTToken()
-    this.client = this.$axios.buildAuth(this.token);
+    if (this.editable){
+      this.token = await this.$auth.getJWTToken()
+      this.client = this.$axios.buildAuth(this.token);
+    }
   },
   computed: {
     labelPublish() {
@@ -93,7 +103,7 @@ export default {
     },
     togglePublish() {
       this.waitingAction=true
-      this.client.patch(`/auth/travels/${this.travel.travelId}/publish`, {published: !this.travel.published})
+      this.client.patch(`/auth/travels/${this.travel.travelId}/publish`, {published: (this.travel.published===1 ? 0 : 1)})
         .then(res => this.$emit('change',res.data))
       .catch(() => this.$notifier.error('An error occurred performing operation'))
       .finally(()=>this.waitingAction=false)

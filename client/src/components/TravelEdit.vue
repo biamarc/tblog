@@ -56,7 +56,7 @@
              :error-message="`Field must be not empty greater than ${$v.travel.description.$params.minLength.min} and lower than ${$v.travel.description.$params.maxLength.max} chars`"
     />
 
-    <q-img v-if="travel.imageUrl" src="travel.imageUrl"  style="width: 100%; max-width: 800px">
+    <q-img v-if="travel.imageUrl" :src="travel.imageUrl"  style="width: 100%; max-width: 800px">
       <template v-slot:loading>
         <q-spinner-gears color="white" />
       </template>
@@ -167,7 +167,9 @@ export default {
             const s3res = await this.client.post(`/auth/travels/${res.data.travelId}/attachment`)
             console.log('Pre-signed-url: ', JSON.stringify(s3res))
             // put image to S3
-            await this.$axios.build({timeout: 5000}).put(s3res.data.uploadUrl, this.image)
+            const uploadState = await this.$axios.build({timeout: 5000}).put(s3res.data.uploadUrl, this.image)
+            console.log('Upload state: ', JSON.stringify(uploadState))
+            this.imageUrl = s3res.data.uploadUrl.split('?')[0]
           } catch (e) {
             this.$notifier.error('Error uploading image')
           }

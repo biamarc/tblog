@@ -6,7 +6,7 @@
 
     <hr class="q-my-md"/>
     <div class="row items-start q-gutter-md">
-      <tb-travel-view v-for="tr in travels" :key="tr.travelId" :travel="tr" :editable="false"/>
+      <tb-travel-view v-for="tr in travels" :key="tr.travelId" :travel="tr"  style="width: 100%"/>
     </div>
     <br/>
     <q-btn v-if="nextKey" label="More" @click="more()" :loading="loading"/>

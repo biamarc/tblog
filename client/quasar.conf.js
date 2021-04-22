@@ -21,7 +21,8 @@ module.exports = function (/* ctx */) {
     // https://v1.quasar.dev/quasar-cli/boot-files
     boot: [
       'axios',
-      'auth0',
+      //'auth0',
+      'auth',
       'components',
       'notifier',
       'vuelidate'

@@ -74,7 +74,7 @@ export default {
   },
   async created() {
     if (this.editable){
-      this.token = await this.$auth.getJWTToken()
+      this.token = await this.$store.state.auth.token
       this.client = this.$axios.buildAuth(this.token);
     }
   },

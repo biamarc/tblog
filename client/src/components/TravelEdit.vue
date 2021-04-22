@@ -115,7 +115,7 @@ export default {
     }
   },
   async created() {
-    this.token = await this.$auth.getJWTToken()
+    this.token = await this.$store.state.auth.token
     this.client = this.$axios.buildAuth(this.token);
     this.getTravel(this.travelId)
   },
@@ -174,7 +174,9 @@ export default {
             this.$notifier.error('Error uploading image')
           }
         }
+        this.$notifier.success('Data saved')
         await this.$router.push(AppRoutes.MY_TRAVELS.path)
+
       } catch (e){
         this.$notifier.error('Error saving data')
       } finally {

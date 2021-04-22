@@ -5,12 +5,12 @@
       <q-item>
         <q-item-section avatar>
           <q-avatar>
-            <img :src="$auth.user.picture" alt="Profile picture">
+            <img :src="user.picture" alt="Profile picture">
           </q-avatar>
         </q-item-section>
 
         <q-item-section>
-          <q-item-label>{{ $auth.user.name }}</q-item-label>
+          <q-item-label>{{ user.name }}</q-item-label>
         </q-item-section>
       </q-item>
 
@@ -24,14 +24,15 @@
             </q-item-section>
 
             <q-item-section>
-              <q-item-label>{{ $auth.user.email }}</q-item-label>
+              <q-item-label>{{ user.email }}</q-item-label>
             </q-item-section>
           </q-item>
         </q-list>
       </q-card-section>
 
       <q-card-section horizontal>
-        <pre>{{ JSON.stringify($auth.user, null, 2) }}</pre>
+<!--        <pre>{{ JSON.stringify($auth.user, null, 2) }}</pre>-->
+        <pre>{{ JSON.stringify(user, null, 2) }}</pre>
       </q-card-section>
     </q-card>
 
@@ -40,7 +41,13 @@
 </template>
 
 <script>
+import {  mapGetters } from 'vuex'
 export default {
-  // name: 'PageName',
+  name: 'Profile',
+  computed: {
+    ...mapGetters({
+      user: 'auth/getUser'
+    })
+  }
 }
 </script>

@@ -9,11 +9,12 @@
 
         <q-btn stretch flat label="Home" :to="routes.HOME.path" />
         <q-btn stretch flat label="Board" />
-        <div v-if="!$auth.loading">
+<!--        <div v-if="!$auth.loading">-->
+          <div >
           <!-- show login when not authenticated -->
-          <q-btn v-if="!$auth.isAuthenticated"  stretch flat label="Login" icon="login" @click="login"/>
+          <q-btn v-if="!isLogged"  stretch flat label="Login" icon="login" @click="login"/>
           <!-- show logout when authenticated -->
-            <q-btn-dropdown  v-if="$auth.isAuthenticated"
+          <q-btn-dropdown  v-else
               stretch flat
               label="Account"
               icon="account_circle"
@@ -69,6 +70,7 @@
 
 <script>
 import {AppRoutes} from '../models/path_constants'
+import { mapActions, mapGetters } from 'vuex'
 export default {
   name: 'MainLayout',
   data () {
@@ -76,11 +78,19 @@ export default {
     }
   },
   computed: {
+    ...mapGetters({
+      isLogged: 'auth/isLogged'
+    }),
     routes (){
       return AppRoutes;
     }
   },
   methods: {
+    ...mapActions({
+      login:  'auth/login',
+      logout: 'auth/logout'
+    }),
+    /*
     login() {
       console.log('login')
       this.$auth.loginWithRedirect();
@@ -91,6 +101,7 @@ export default {
         returnTo: window.location.origin
       });
     }
+    */
   }
 }
 </script>

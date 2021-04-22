@@ -14,7 +14,7 @@ Vue.use(VueRouter)
  * with the Router instance.
  */
 
-export default function (/* { store, ssrContext } */) {
+export default function ( { store }) {
   const Router = new VueRouter({
     scrollBehavior: () => ({ x: 0, y: 0 }),
     routes,
@@ -25,6 +25,27 @@ export default function (/* { store, ssrContext } */) {
     mode: process.env.VUE_ROUTER_MODE,
     base: process.env.VUE_ROUTER_BASE
   })
+
+  // navigation guard
+  Router.beforeEach((to, from, next) => {
+    // console.log('Enter navigation guard')
+    if (to.matched.some(record => record.meta.requiresAuth)) {
+      // console.log('Request a protected url')
+      const loggedIn = store.getters['auth/isLogged']
+      // console.log('User is logged?: ' + loggedIn)
+      if (!loggedIn) {
+        // console.log('Redirect to home')
+        next({ path: '/' })
+      } else {
+        // console.log('Proceed to protected url')
+        next()
+      }
+    } else {
+      // console.log('Normal navigation')
+      next()
+    }
+  })
+
 
   return Router
 }

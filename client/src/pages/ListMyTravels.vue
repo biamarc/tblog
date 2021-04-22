@@ -27,7 +27,7 @@ export default {
     }
   },
   async created() {
-    this.token = await this.$auth.getJWTToken()
+    this.token = this.$store.state.auth.token
     this.client = this.$axios.buildAuth(this.token);
     this.list()
   },

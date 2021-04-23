@@ -20,7 +20,7 @@
     </q-card-section>
 
     <q-card-section class="q-pt-none">
-      {{ travel.description }}
+      {{ travel.description|truncate(200) }}
     </q-card-section>
     <q-separator/>
 

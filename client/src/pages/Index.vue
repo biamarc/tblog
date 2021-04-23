@@ -1,7 +1,7 @@
 <template>
   <q-page padding>
     <tb-title-page icon="travel_explore" title="Welcome to Traveler Blog">
-      <q-btn icon="refresh" color="primary" class="q-mx-md" :loading="loading" @click="list()"></q-btn>
+      <q-btn icon="refresh" color="primary" class="q-mx-md" :loading="loading" @click="list()" flat>Refresh</q-btn>
     </tb-title-page>
 
     <hr class="q-my-md"/>

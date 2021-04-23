@@ -175,17 +175,24 @@ export default {
           }
         }
         this.$notifier.success('Data saved')
-        await this.$router.push(AppRoutes.MY_TRAVELS.path)
-
+        this.redirect()
       } catch (e){
         this.$notifier.error('Error saving data')
-      } finally {
         this.loading = false
+      } finally {
+        // nop
       }
     },
     onRejected (rejectedEntries) {
       console.log('Rejected entries',JSON.stringify(rejectedEntries))
       this.$notifier.warning(`${rejectedEntries.length} file(s) did not pass validation constraints`)
+    },
+    redirect() {
+      const self = this
+      setTimeout(()=> {
+        self.loading = false
+        self.$router.push(AppRoutes.MY_TRAVELS.path)
+      }, 1000)
     }
   }
 }

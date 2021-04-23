@@ -1,7 +1,8 @@
 <template>
   <q-page padding>
     <tb-title-page icon="travel_explore" title="My Travels">
-      <q-btn icon="add" color="primary" class="q-mx-md" :to="newTravel" :loading="loading">New travel</q-btn>
+      <q-btn icon="add" color="primary" class="q-mx-md" :to="newTravel" :loading="loading" flat>New travel</q-btn>
+      <q-btn icon="refresh" color="primary" class="q-mx-md" :loading="loading" @click="list()" flat>Refresh content</q-btn>
     </tb-title-page>
     <hr class="q-my-md"/>
     <div class="row items-start q-gutter-md">

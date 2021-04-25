@@ -6,7 +6,7 @@
       <div v-if="isLogged">
         <q-btn color="red" v-if="liked.travelId" icon="clear" @click="deleteLike()" :loading="loading" class="q-mx-sm q-px-sm"/>
         <q-btn color="primary" icon="thumb_up" @click="like(true)" :loading="loading" class="q-mx-sm q-px-sm">
-          <q-badge v-if="travel.like" outline color="primary" :label="travel.like"/>
+          <q-badge v-if="travel.like" outline color="default" :label="travel.like"/>
         </q-btn>
         <q-btn icon="thumb_down" @click="like(false)" :loading="loading" class="q-mx-sm q-px-sm">
           <q-badge v-if="travel.unlike" outline color="primary" :label="travel.unlike"/>

@@ -8,47 +8,42 @@
         <q-space />
 
         <q-btn stretch flat label="Home" :to="routes.HOME.path" />
-        <q-btn stretch flat label="Board" />
-<!--        <div v-if="!$auth.loading">-->
-          <div >
-          <!-- show login when not authenticated -->
-          <q-btn v-if="!isLogged"  stretch flat label="Login" icon="login" @click="login"/>
-          <!-- show logout when authenticated -->
-          <q-btn-dropdown  v-else
-              stretch flat
-              label="Account"
-              icon="account_circle"
-            >
-              <q-list>
-                <q-item clickable  :to="routes.MY_TRAVELS.path">
-                  <q-item-section>
-                    <q-avatar icon="travel_explore"/>
-                  </q-item-section>
-                  <q-item-section>
-                    <q-item-label>Travels</q-item-label>
-                  </q-item-section>
-                </q-item>
-                <q-item clickable  :to="routes.PROFILE.path">
-                  <q-item-section>
-                    <q-avatar icon="account_circle"/>
-                  </q-item-section>
-                  <q-item-section>
-                    <q-item-label>Profile</q-item-label>
-                  </q-item-section>
-                </q-item>
-                <q-item clickable  @click="logout">
-                  <q-item-section>
-                    <q-avatar icon="logout"/>
-                  </q-item-section>
-                  <q-item-section>
-                    <q-item-label>Logout</q-item-label>
-                  </q-item-section>
-                </q-item>
+        <!-- show login when not authenticated -->
+        <q-btn v-if="!isLogged"  stretch flat label="Login" icon="login" @click="login"/>
+        <!-- show logout when authenticated -->
+        <q-btn-dropdown  v-else
+            stretch flat
+            label="Account"
+            icon="account_circle"
+          >
+            <q-list>
+              <q-item clickable  :to="routes.MY_TRAVELS.path">
+                <q-item-section>
+                  <q-avatar icon="travel_explore"/>
+                </q-item-section>
+                <q-item-section>
+                  <q-item-label>Travels</q-item-label>
+                </q-item-section>
+              </q-item>
+              <q-item clickable  :to="routes.PROFILE.path">
+                <q-item-section>
+                  <q-avatar icon="account_circle"/>
+                </q-item-section>
+                <q-item-section>
+                  <q-item-label>Profile</q-item-label>
+                </q-item-section>
+              </q-item>
+              <q-item clickable  @click="logout">
+                <q-item-section>
+                  <q-avatar icon="logout"/>
+                </q-item-section>
+                <q-item-section>
+                  <q-item-label>Logout</q-item-label>
+                </q-item-section>
+              </q-item>
 
-              </q-list>
-            </q-btn-dropdown>
-
-        </div>
+            </q-list>
+          </q-btn-dropdown>
         <q-separator dark vertical />
       </q-toolbar>
     </q-header>

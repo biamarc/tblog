@@ -4,10 +4,11 @@
     </tb-title-page>
     <tb-travel-view :travel="travel" :limit="new Number(-1)">
       <div v-if="isLogged">
-        <q-btn icon="thumb_up" @click="like(true)" :loading="loading">
+        <q-btn color="red" v-if="liked.travelId" icon="clear" @click="deleteLike()" :loading="loading" class="q-mx-sm q-px-sm"/>
+        <q-btn color="primary" icon="thumb_up" @click="like(true)" :loading="loading" class="q-mx-sm q-px-sm">
           <q-badge v-if="travel.like" outline color="primary" :label="travel.like"/>
         </q-btn>
-        <q-btn flat icon="thumb_down" @click="like(false)" :loading="loading" class="q-px-sm">
+        <q-btn icon="thumb_down" @click="like(false)" :loading="loading" class="q-mx-sm q-px-sm">
           <q-badge v-if="travel.unlike" outline color="primary" :label="travel.unlike"/>
         </q-btn>
       </div>
@@ -16,8 +17,8 @@
 </template>
 
 <script>
-import {Travel} from "src/models/travel"
 import {mapGetters} from 'vuex'
+
 export default {
   name: 'TravelDetails',
   props: ['travelId'],
@@ -27,6 +28,9 @@ export default {
         name: null
       },
       loading: false,
+      liked: {
+
+      }
     }
   },
   computed: {
@@ -38,6 +42,7 @@ export default {
   created() {
     if (this.isLogged){
       this.clientAuth = this.$axios.buildAuth(this.token)
+      this.isLiked(this.travelId)
     }
     this.client = this.$axios.build()
     this.fetch(this.travelId)
@@ -46,6 +51,9 @@ export default {
     travelId: {
       handler: function (nv) {
         this.fetch(nv)
+        if (this.isLogged){
+          this.isLiked(nv)
+        }
       }
     }
   },
@@ -68,8 +76,29 @@ export default {
       try {
         const res = await this.clientAuth.put(`auth/travels/${this.travelId}/likes`, {like: value})
         this.travel = res.data
+        this.liked.travelId = this.travel.travelId
       } catch (e){
         this.$notifier.error('Error putting like to travel')
+      } finally {
+        this.loading = false
+      }
+    },
+    async isLiked(tid) {
+      try {
+        const res = await this.clientAuth.get(`auth/travels/${tid}/likes`)
+        this.liked = res.data
+      } catch (e){
+        // noop not like
+      }
+    },
+    async deleteLike () {
+      this.loading = true
+      try {
+        const res = await this.clientAuth.delete(`auth/travels/${this.travelId}/likes`)
+        this.travel = res.data
+        this.liked.travelId = null
+      } catch (e){
+        this.$notifier.error('Error removing like to travel')
       } finally {
         this.loading = false
       }

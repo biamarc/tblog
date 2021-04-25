@@ -9,7 +9,7 @@ import {PutLikeTravelRequest} from "../../../requests/PutLikeTravelRequest";
 import {LikeItem} from "../../../models/LikeItem";
 import {createLike, getLike, updateLike} from "../../../services/LikesTravelsService";
 
-const logger = createLogger('createTravel')
+const logger = createLogger('putLikeOnTravel')
 /**
  * Put a like on a travel
  * @param event the request from API Gateway containing the data used to created the like
@@ -50,6 +50,9 @@ export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEven
         }
         likeItem.like = likeRequest.like
         await updateLike(userId, travelId, likeRequest)
+    } else if (likeItem !== null && likeItem.like === likeRequest.like) {
+        inc.like = 0
+        inc.unlike = 0
     } else {
         if (likeRequest.like) {
             inc.like = +1
@@ -63,10 +66,9 @@ export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEven
     // update the like on the travel
     travelItem.like = (travelItem.like | 0) + inc.like
     travelItem.unlike = (travelItem.unlike | 0) + inc.unlike
-    await likeTravel(travelItem)
-
+    const updatedTravel:TravelItem = await likeTravel(travelItem)
     // remove userId
-    const travelResult: TravelResult = removeUserIdFromItem(travelItem)
+    const travelResult: TravelResult = removeUserIdFromItem(updatedTravel)
     return {
         statusCode: 200,
         headers: {

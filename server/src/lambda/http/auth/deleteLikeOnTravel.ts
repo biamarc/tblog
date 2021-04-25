@@ -2,13 +2,13 @@ import 'source-map-support/register'
 
 import {APIGatewayProxyEvent, APIGatewayProxyHandler, APIGatewayProxyResult} from 'aws-lambda'
 import {getUserId, removeUserIdFromItem} from "../../utils";
-import {getTravelById} from "../../../services/TravelsService";
+import {getTravelById, likeTravel} from "../../../services/TravelsService";
 import {TravelItem, TravelResult} from "../../../models/TravelItem";
 import {createLogger} from "../../../utils/logger";
 import {LikeItem} from "../../../models/LikeItem";
 import {deleteLike, getLike} from "../../../services/LikesTravelsService";
 
-const logger = createLogger('createTravel')
+const logger = createLogger('deleteLikeOnTravel')
 /**
  * Delete a like remove like/unlike on a travel
  * @param event the request from API Gateway containing the data used to remove the like
@@ -51,12 +51,14 @@ export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEven
         inc.like = 0
         inc.unlike = -1
     }
+    // delete like
     await deleteLike(userId, travelId)
+    // update travel
     travelItem.like = (travelItem.like | 0) + inc.like
     travelItem.unlike = (travelItem.unlike | 0) + inc.unlike
-
+    const updatedTravel:TravelItem = await likeTravel(travelItem)
     // remove userId
-    const travelResult: TravelResult = removeUserIdFromItem(travelItem)
+    const travelResult: TravelResult = removeUserIdFromItem(updatedTravel)
     return {
         statusCode: 200,
         headers: {

@@ -38,6 +38,8 @@ provider:
     SIGNED_URL_EXPIRATION: 300
     CONNECTIONS_TABLE: Connections-${self:provider.stage}
     CONNECTIONS_USER_ID_INDEX: UserIdIndex
+    LIKES_TRAVELS_TABLE: LikesTravels-${self:provider.stage}
+    LIKES_TRAVELS_USER_ID_INDEX: UserIdIndex
 
   # Global IAM role that must be included in any lambda to allow tracing
   iamRoleStatements:
@@ -230,7 +232,71 @@ functions:
         Resource:
           arn:aws:s3:::${self:provider.environment.TRAVELS_IMAGES_S3_BUCKET}/*
 
-  # get all travels owned by a user
+  # put a like
+  PutLikeOnTravel:
+    handler: src/lambda/http/auth/putLikeOnTravel.handler
+    events:
+      - http:
+          method: put
+          path: auth/travels/{travelId}/likes
+          cors: true
+          authorizer: Auth
+          request:
+            schema:
+              application/json: ${file(validators/putlike-travel-request.json)}
+          documentation:
+            summary: "Put a like to travel"
+            description: "The API allow to put a like on a travel"
+    iamRoleStatements:
+      - Effect: "Allow"
+        Action:
+        - dynamodb:GetItem
+        - dynamodb:UpdateItem
+        - dynamodb:PutItem
+        Resource:
+          arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.LIKES_TRAVELS_TABLE}
+      - Effect: "Allow"
+        Action:
+          - dynamodb:UpdateItem
+        Resource:
+          arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TRAVELS_TABLE}
+      - Effect: "Allow"
+        Action:
+          - dynamodb:Query
+        Resource:
+          arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TRAVELS_TABLE}/index/${self:provider.environment.TRAVELS_ID_INDEX}
+
+  # remove a like
+  DeleteLikeOnTravel:
+    handler: src/lambda/http/auth/deleteLikeOnTravel.handler
+    events:
+      - http:
+          method: delete
+          path: auth/travels/{travelId}/likes
+          cors: true
+          authorizer: Auth
+          documentation:
+            summary: "Remove a like to travel"
+            description: "The API allow to remove a like previous created on a travel"
+    iamRoleStatements:
+      - Effect: "Allow"
+        Action:
+          - dynamodb:GetItem
+          - dynamodb:DeleteItem
+        Resource:
+          arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.LIKES_TRAVELS_TABLE}
+      - Effect: "Allow"
+        Action:
+          - dynamodb:UpdateItem
+        Resource:
+          arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TRAVELS_TABLE}
+      - Effect: "Allow"
+        Action:
+          - dynamodb:Query
+        Resource:
+          arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TRAVELS_TABLE}/index/${self:provider.environment.TRAVELS_ID_INDEX}
+
+  # get all published travel
   GetPublishedTravels:
     handler: src/lambda/http/public/getPublishedTravels.handler
     events:
@@ -247,6 +313,25 @@ functions:
           - dynamodb:Query
         Resource:
           arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TRAVELS_TABLE}/index/${self:provider.environment.TRAVELS_PUBLISHED_ID_INDEX}
+
+  # get single published travel
+  GetPublishedTravel:
+    handler: src/lambda/http/public/getPublishedTravel.handler
+    events:
+      - http:
+          path: travels/{travelId}
+          method: get
+          cors: true
+          documentation:
+            summary: "Get the published travel detail"
+            description: "The API allow to retrieve a single published travel"
+    iamRoleStatements:
+      - Effect: "Allow"
+        Action:
+          - dynamodb:Query
+        Resource:
+          arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TRAVELS_TABLE}/index/${self:provider.environment.TRAVELS_ID_INDEX}
+
 
   # synchronize an uploaded image to travel
   SyncTravelWithImage:
@@ -375,7 +460,6 @@ resources:
               Resource: 'arn:aws:s3:::${self:provider.environment.TRAVELS_IMAGES_S3_BUCKET}/*'
         Bucket: !Ref TravelsImagesBucket
 
-
     TravelsDynamoDBTable:
       Type: AWS::DynamoDB::Table
       Properties:
@@ -468,3 +552,30 @@ resources:
               KeyType: RANGE
           Projection:
             ProjectionType: ALL
+
+    LikeTravelsDynamoDBTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: userId
+            AttributeType: S
+          - AttributeName: travelId
+            AttributeType: S
+          - AttributeName: createdAt
+            AttributeType: S
+        KeySchema:
+          - AttributeName: userId
+            KeyType: HASH
+          - AttributeName: travelId
+            KeyType: RANGE
+        BillingMode: PAY_PER_REQUEST
+        TableName: ${self:provider.environment.LIKES_TRAVELS_TABLE}
+        GlobalSecondaryIndexes:
+          - IndexName: ${self:provider.environment.LIKES_TRAVELS_USER_ID_INDEX}
+            KeySchema:
+              - AttributeName: userId
+                KeyType: HASH
+              - AttributeName: createdAt
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL

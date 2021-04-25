@@ -1,0 +1,15 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "likeTravel",
+  "type": "object",
+  "properties": {
+    "like": {
+      "type": "boolean",
+      "description": "If true like the travel"
+    }
+  },
+  "required": [
+    "like"
+  ],
+  "additionalProperties": false
+}

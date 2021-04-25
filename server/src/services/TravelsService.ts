@@ -44,7 +44,9 @@ export async function createTravel(userId: string, req: CreateTravelRequest): Pr
         endDate: req.endDate,
         published: req.published,
         createdAt: new Date().toISOString(),
-        imageUrl: null
+        imageUrl: null,
+        like: 0,
+        unlike: 0
     }
     return repo.createTravel(obj)
 }
@@ -118,4 +120,28 @@ export async function updateTravelImage(travelId: string, imageUrl: string): Pro
     if (obj !== null) {
         return repo.updateTravelImageUrl(obj, imageUrl)
     }
+}
+
+/**
+ * Get travel by its id
+ * @param travelId the pk of item
+ */
+export async function getTravelById(travelId: string): Promise<TravelItem> {
+    return await repo.getTravelById(travelId)
+}
+
+/**
+ * Update a travel item
+ * @param item
+ */
+export async function updateTravelItem(item: TravelItem): Promise<TravelItem> {
+    return repo.updateTravel(item)
+}
+
+/**
+ * Adjust like on a travel item
+ * @param item
+ */
+export async function likeTravel(item: TravelItem): Promise<TravelItem> {
+    return repo.likeTravel(item)
 }

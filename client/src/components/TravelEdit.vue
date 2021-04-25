@@ -119,13 +119,13 @@ export default {
     this.client = this.$axios.buildAuth(this.token);
     this.getTravel(this.travelId)
   },
-  watch: {
-    travelId: {
-      handler: function (nv) {
-        this.getTravel(nv)
+    watch: {
+      travelId: {
+        handler: function (nv) {
+          this.getTravel(nv)
+        }
       }
-    }
-  },
+    },
   computed: {
     undo() {
       return AppRoutes.MY_TRAVELS.path;

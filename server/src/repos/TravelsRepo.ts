@@ -196,4 +196,31 @@ export class TravelsRepo {
         return result.Count == 1 ? result.Items[0] as TravelItem : null
     }
 
+
+    /**
+     * Update the like, or unlike on a travel
+     * @param obj
+     */
+    async likeTravel(obj: TravelItem): Promise<TravelItem> {
+        this.logger.info("Update travel: %s", JSON.stringify(obj))
+
+        await this.docClient.update({
+            TableName: this.travelTable,
+            Key: {
+                userId: obj.userId,
+                travelId: obj.travelId
+            },
+            UpdateExpression: "set #like=:like, #unlike=:unlike",
+            ExpressionAttributeNames: {
+                "#like": 'like',
+                "#unlike": 'unlike',
+            },
+            ExpressionAttributeValues: {
+                ":like": obj.like,
+                ":unlike": obj.unlike
+            },
+        }).promise()
+
+        return obj
+    }
 }

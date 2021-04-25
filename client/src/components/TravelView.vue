@@ -20,7 +20,7 @@
     </q-card-section>
 
     <q-card-section class="q-pt-none">
-      {{ travel.description|truncate(200) }}
+      {{ travel.description|truncate(limit) }}
     </q-card-section>
     <q-separator/>
 
@@ -38,6 +38,11 @@ export default {
     travel: {
       type: Object,
       required: true,
+    },
+    limit: {
+      type: Number,
+      required: false,
+      default: 200
     }
   },
   data() {

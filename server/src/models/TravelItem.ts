@@ -11,5 +11,7 @@ export interface TravelResult {
   endDate: string
   published: boolean
   imageUrl?: string
+  like: number
+  unlike: number
 }
 

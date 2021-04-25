@@ -15,7 +15,7 @@ const logger = createLogger('deleteTravel')
  */
 export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   logger.info('Received event: %s', JSON.stringify(event))
-  // todoItem to delete
+  // travelId to delete
   const travelId = event.pathParameters.travelId
   logger.info('Delete travel: %s', travelId)
 

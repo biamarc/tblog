@@ -3,7 +3,7 @@ import 'source-map-support/register'
 import {getTravelById} from "../../services/TravelsService";
 import {TravelItem} from "../../models/TravelItem";
 import {createLogger} from "../../utils/logger";
-import {getUserConnections} from "../../services/ConnectionsService";
+import {getUserConnections, remove} from "../../services/ConnectionsService";
 import {Connection} from "../../models/Connection";
 import {send} from "../../services/NotificationService";
 import {Notification} from "../../models/Notification";
@@ -40,8 +40,16 @@ export const handler: DynamoDBStreamHandler = async (event: DynamoDBStreamEvent)
             const connection: Connection[] = await getUserConnections(travel.userId)
             logger.info('Find connections.size(): %s', connection ? connection.length : null)
             for (const conn of connection) {
-                logger.info('Send notification on connectionId = %s', JSON.stringify(conn))
-                await send(conn, notification)
+                try {
+                    logger.info('Send notification on connectionId = %s', JSON.stringify(conn))
+                    await send(conn, notification)
+                } catch (e) {
+                    logger.error('Failed to send message: %s', JSON.stringify(e))
+                    if (e.statusCode === 410) {
+                        logger.info('Stale connection')
+                        await remove(conn.id)
+                    }
+                }
             }
         }
     }

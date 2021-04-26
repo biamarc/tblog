@@ -2,7 +2,6 @@ import {APIGatewayProxyEvent, APIGatewayProxyHandler, APIGatewayProxyResult} fro
 import 'source-map-support/register'
 import {Connection} from "../../models/Connection";
 import {create} from "../../services/ConnectionsService";
-import {getUserId} from "../utils";
 import {createLogger} from "../../utils/logger";
 
 
@@ -14,20 +13,9 @@ const logger = createLogger('connection')
 export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
 
     logger.info('Websocket connect: %s', JSON.stringify(event))
-
-    // extract userId from JWT Token
-    const userId :string = getUserId(event)
-    if (!userId){
-        logger.error('Userid was not found on request')
-        return {
-            statusCode: 401,
-            body: 'Logged user was not found'
-        }
-
-    }
     const item: Connection = {
         id: event.requestContext.connectionId,
-        userId: userId,
+        userId: '_unknown_',
         timestamp: new Date().toISOString()
     }
 

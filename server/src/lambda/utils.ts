@@ -16,6 +16,10 @@ export function getUserId(event: APIGatewayProxyEvent): string {
   return parseUserId(jwtToken)
 }
 
+export function getUserFormToken(jwtToken: string): string {
+  return parseUserId(jwtToken)
+}
+
 /**
  * Remove userId from array of TodoItem[]
  * @param travelItems the array of items

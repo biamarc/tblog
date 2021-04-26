@@ -4,6 +4,7 @@ import {Connection} from "../models/Connection";
 import {createLogger} from "../utils/logger";
 import QueryInput = DocumentClient.QueryInput;
 import QueryOutput = DocumentClient.QueryOutput;
+import GetItemOutput = DocumentClient.GetItemOutput;
 
 
 /**
@@ -11,6 +12,7 @@ import QueryOutput = DocumentClient.QueryOutput;
  */
 export class ConnectionsRepo {
     private logger = createLogger('connectionRepos')
+
     constructor(
         private readonly docClient: DocumentClient = createDynamoDBClient(),
         private readonly connectionsTable = process.env.CONNECTIONS_TABLE,
@@ -38,7 +40,21 @@ export class ConnectionsRepo {
         };
         this.logger.info('Query params: %s', JSON.stringify(queryInput));
         const result: QueryOutput = await this.docClient.query(queryInput).promise();
-        return  result.Items as Connection[]
+        return result.Items as Connection[]
+    }
+
+    /**
+     * Return the connection specified by connectionId
+     * @param connectionId the key of connection
+     */
+    async getConnection(connectionId: string): Promise<Connection> {
+        const result: GetItemOutput = await this.docClient.get({
+            TableName: this.connectionsTable,
+            Key: {
+                id: connectionId,
+            }
+        }).promise()
+        return (!!result.Item) ? result.Item as Connection : null
     }
 
     /**
@@ -67,5 +83,28 @@ export class ConnectionsRepo {
                 id: connectionId
             }
         }).promise()
+    }
+
+    /**
+     * Update a connection with userId
+     * @param obj the connection to save
+     */
+    async update(obj: Connection): Promise<Connection> {
+        this.logger.info('Update connection: %s', JSON.stringify(obj));
+        await this.docClient.update({
+            TableName: this.connectionsTable,
+            Key: {
+                id: obj.id
+            },
+            UpdateExpression: "set #userId=:userId",
+            ExpressionAttributeNames: {
+                "#userId": 'userId'
+            },
+            ExpressionAttributeValues: {
+                ":userId": obj.userId
+            },
+        }).promise()
+
+        return obj
     }
 }

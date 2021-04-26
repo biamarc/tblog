@@ -1,6 +1,8 @@
-import { decode } from 'jsonwebtoken'
+import {decode, JwtHeader, verify} from 'jsonwebtoken'
 
 import { JwtPayload } from './JwtPayload'
+import * as jwksClient from "jwks-rsa";
+import {Jwt} from "./Jwt";
 
 
 /**
@@ -26,4 +28,32 @@ export function parseAuthHeader(authHeader: string): string{
 
   const split = authHeader.split(' ')
   return split[1]
+}
+
+
+const client = jwksClient({
+  cache: true,
+  cacheMaxEntries: 5,
+  cacheMaxAge: 600000,
+  jwksUri: 'https://devside.eu.auth0.com/.well-known/jwks.json'
+});
+
+export async function getKey(header: JwtHeader) {
+  const key = await client.getSigningKeyAsync(header.kid)
+  return key.getPublicKey()
+}
+
+export async function verifyToken(authHeader: string): Promise<JwtPayload> {
+  // extract token
+  const token = parseAuthHeader(authHeader)
+  // decode token
+  const jwt: Jwt = decode(token, {complete: true}) as Jwt
+  const certificate: string = await getKey(jwt.header)
+  if (!certificate) {
+    throw Error('Unable to get certificate')
+  }
+  // verify token
+  verify(token, certificate, {algorithms: ['RS256']})
+
+  return jwt.payload
 }

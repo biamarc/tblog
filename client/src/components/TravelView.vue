@@ -3,7 +3,7 @@
     <q-img
       v-if="travel.imageUrl"
       :src="travel.imageUrl"
-      style="width:100%; max-width: 600px"
+      :class="imgClass"
     >
       <template v-slot:error>
         <div class="absolute-full flex flex-center bg-negative text-white">
@@ -51,6 +51,11 @@ export default {
       type: Number,
       required: false,
       default: 200
+    },
+    imgClass: {
+      type: String,
+      required: false,
+      default: 'default-img-class'
     }
   },
   data() {

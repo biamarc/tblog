@@ -10,7 +10,7 @@
 
     <div class="row">
       <div class="col-3">
-        <q-input v-model="travel.startDate" label="Start date" hint="The start date of your travel" clearable
+        <q-input v-model="travel.startDate" label="Start date" hint="The start date of your travel" clearable  readonly
                  @blur="$v.travel.startDate.$touch"
                  :error="$v.travel.startDate.$error"
                  error-message="Field must not be empty"
@@ -29,7 +29,7 @@
         </q-input>
       </div>
       <div class="offset-1 col-3">
-        <q-input v-model="travel.endDate" label="End date" hint="The end date of your travel" clearable
+        <q-input v-model="travel.endDate" label="End date" hint="The end date of your travel" clearable  readonly
                  @blur="$v.travel.endDate.$touch"
                  :error="$v.travel.endDate.$error"
                  error-message="Field must not be empty">

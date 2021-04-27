@@ -6,7 +6,7 @@
 
     <hr class="q-my-md"/>
     <div class="row flex q-gutter-lg">
-      <tb-travel-view v-for="tr in travels" :key="tr.travelId" :travel="tr"  class="my-card q-pa-lg">
+      <tb-travel-view v-for="tr in travels" :key="tr.travelId" :travel="tr"  class="my-card q-pa-lg" img-class="card-img-class">
         <q-btn icon="launch" @click="goTo(tr.travelId)" color="primary" class="q-mx-sm q-px-sm">Detail</q-btn>
       </tb-travel-view>
     </div>

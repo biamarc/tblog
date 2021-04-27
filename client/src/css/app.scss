@@ -1,1 +1,10 @@
 // app global css in SCSS form
+.default-img-class{
+  width: 100%;
+  max-width: 1024px;
+}
+
+.card-img-class{
+  min-height: 300px;
+  max-height: 300px;
+}

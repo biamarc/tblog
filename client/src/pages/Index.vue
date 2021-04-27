@@ -5,10 +5,9 @@
     </tb-title-page>
 
     <hr class="q-my-md"/>
-    <div class="row items-start q-gutter-md">
-
-      <tb-travel-view v-for="tr in travels" :key="tr.travelId" :travel="tr" style="width: 100%">
-        <q-btn icon="launch" @click="goTo(tr.travelId)">Detail</q-btn>
+    <div class="row flex q-gutter-lg">
+      <tb-travel-view v-for="tr in travels" :key="tr.travelId" :travel="tr"  class="my-card q-pa-lg">
+        <q-btn icon="launch" @click="goTo(tr.travelId)" color="primary" class="q-mx-sm q-px-sm">Detail</q-btn>
       </tb-travel-view>
     </div>
     <br/>
@@ -64,3 +63,16 @@ export default {
   }
 }
 </script>
+<style lang="sass">
+.my-card
+  min-width: 300px
+  max-width: 600px
+.flex-break
+  flex: 1 0 100% !important
+.row
+  .flex-break
+    height: 0 !important
+.column
+  .flex-break
+    width: 0 !important
+</style>

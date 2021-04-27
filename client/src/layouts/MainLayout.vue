@@ -9,6 +9,10 @@
 
         <q-btn stretch flat label="Home" :to="routes.HOME.path" />
         <!-- show login when not authenticated -->
+
+        <q-btn v-if="isLogged && messages.length>0" round flat icon="email" class="q-ml-md">
+        <q-badge color="orange" floating>{{messages.length}}</q-badge>
+        </q-btn>
         <q-btn v-if="!isLogged"  stretch flat label="Login" icon="login" @click="login"/>
         <!-- show logout when authenticated -->
         <q-btn-dropdown  v-else
@@ -16,6 +20,7 @@
             label="Account"
             icon="account_circle"
           >
+
             <q-list>
               <q-item clickable  :to="routes.MY_TRAVELS.path">
                 <q-item-section>
@@ -65,7 +70,8 @@
 
 <script>
 import {AppRoutes} from '../models/path_constants'
-import { mapActions, mapGetters } from 'vuex'
+import {mapActions, mapGetters} from 'vuex'
+
 export default {
   name: 'MainLayout',
   data () {
@@ -74,7 +80,8 @@ export default {
   },
   computed: {
     ...mapGetters({
-      isLogged: 'auth/isLogged'
+      isLogged: 'auth/isLogged',
+      messages: 'auth/getMessages'
     }),
     routes (){
       return AppRoutes;
@@ -84,19 +91,7 @@ export default {
     ...mapActions({
       login:  'auth/login',
       logout: 'auth/logout'
-    }),
-    /*
-    login() {
-      console.log('login')
-      this.$auth.loginWithRedirect();
-    },
-    logout () {
-      console.log('logout')
-      this.$auth.logout({
-        returnTo: window.location.origin
-      });
-    }
-    */
+    })
   }
 }
 </script>

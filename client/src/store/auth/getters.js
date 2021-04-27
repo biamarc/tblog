@@ -15,4 +15,12 @@ export function getLoginApi (state) {
   return state.loginApi
 }
 
+export function getWsApi (state) {
+  return state.wsApi
+}
+
+export function getMessages (state) {
+  return state.messages
+}
+
 

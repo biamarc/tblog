@@ -10,3 +10,12 @@ export function setToken (state, token) {
   state.token = token
 }
 
+export function setWsApi (state, wsw) {
+  state.wsApi = wsw
+}
+
+export function addMessage (state, msg) {
+  state.messages.push(msg)
+}
+
+

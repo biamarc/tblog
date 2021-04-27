@@ -10,10 +10,8 @@ export async function login( {state,commit}) {
 export async function logout( {state, commit}) {
   if (state.loginApi.isAuthenticated) {
     await state.loginApi.logout()
+    state.wsApi.close()
   }
-  console.log('commit setUser')
   commit('setUser', null)
-  console.log('commit setToken')
   commit('setToken', null)
-
 }

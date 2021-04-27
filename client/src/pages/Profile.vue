@@ -30,10 +30,9 @@
         </q-list>
       </q-card-section>
 
-      <q-card-section horizontal>
-<!--        <pre>{{ JSON.stringify($auth.user, null, 2) }}</pre>-->
-        <pre>{{ JSON.stringify(user, null, 2) }}</pre>
-      </q-card-section>
+<!--      <q-card-section horizontal>-->
+<!--        <pre>{{ JSON.stringify(user, null, 2) }}</pre>-->
+<!--      </q-card-section>-->
     </q-card>
 
 

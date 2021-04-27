@@ -7,7 +7,7 @@
     </tb-title-page>
     <hr class="q-my-md"/>
     <div class="row items-start q-gutter-md">
-      <tb-travel-view v-for="tr in travels" :key="tr.travelId" :travel="tr" style="width: 100%">
+      <tb-travel-view v-for="tr in travels" :key="tr.travelId" :travel="tr" style="width: 100%" img-class="mytravels-img-class">
         <q-btn flat :icon="tr.published ? 'unpublished' : 'publish'" @click="togglePublish(tr)"
                :loading="waitingAction">{{ tr.published ? 'Unpublish' : 'Publish' }}
         </q-btn>

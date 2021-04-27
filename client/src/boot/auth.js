@@ -21,7 +21,7 @@ export default async ( { store } ) => {
     wsw.open()
     wsw.onError((e) => console.error('Error connecting wss', e))
     wsw.onClose((e) => console.info('Close connection wss', e))
-    wsw.onMessage((e) => store.commit('auth/addMessage', e.data))
+    wsw.onMessage((e) => store.commit('auth/addMessage', JSON.parse(e.data)))
     wsw.onOpen(() => wsw.auth(store.state.auth.token))
   }
 }

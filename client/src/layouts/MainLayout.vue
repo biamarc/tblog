@@ -10,7 +10,7 @@
         <q-btn stretch flat label="Home" :to="routes.HOME.path" />
         <!-- show login when not authenticated -->
 
-        <q-btn v-if="isLogged && messages.length>0" round flat icon="email" class="q-ml-md">
+        <q-btn v-if="isLogged && messages.length>0" round flat icon="email" class="q-ml-md" :to="routes.LIKED_TRAVEL.path">
         <q-badge color="orange" floating>{{messages.length}}</q-badge>
         </q-btn>
         <q-btn v-if="!isLogged"  stretch flat label="Login" icon="login" @click="login"/>
@@ -60,7 +60,6 @@
     <q-footer elevated class="bg-grey-8 text-white">
       <q-toolbar>
         <q-toolbar-title>
-          Photo from Unsplash
         </q-toolbar-title>
       </q-toolbar>
     </q-footer>
@@ -91,7 +90,8 @@ export default {
     ...mapActions({
       login:  'auth/login',
       logout: 'auth/logout'
-    })
+    }),
+
   }
 }
 </script>

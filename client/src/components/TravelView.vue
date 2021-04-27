@@ -17,6 +17,14 @@
         <q-icon name="date_range" size="md" class="q-mr-sm"/>
         {{ travel.startDate }} - {{ travel.endDate }}
       </div>
+      <div class="text-subtitle2 q-mt-md">
+        <q-chip outline color="primary" text-color="white" icon="thumb_up">
+          {{travel.like }}
+        </q-chip>
+        <q-chip outline color="red"  icon="thumb_down">
+          {{travel.unlike }}
+        </q-chip>
+      </div>
     </q-card-section>
 
     <q-card-section class="q-pt-none">

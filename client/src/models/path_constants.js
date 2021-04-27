@@ -4,6 +4,7 @@ const AppRoutes = {
   PROFILE: {path: '/auth/profile', label: 'profile'},
   MY_TRAVELS: {path: '/auth/travels', label: 'my-travels'},
   NEW_TRAVEL: {path: '/auth/newTravel', label: 'new-travels'},
+  LIKED_TRAVEL: {path: '/auth/liked', label: 'travel-liked'},
 
 }
 

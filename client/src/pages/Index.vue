@@ -6,6 +6,7 @@
 
     <hr class="q-my-md"/>
     <div class="row items-start q-gutter-md">
+
       <tb-travel-view v-for="tr in travels" :key="tr.travelId" :travel="tr" style="width: 100%">
         <q-btn icon="launch" @click="goTo(tr.travelId)">Detail</q-btn>
       </tb-travel-view>

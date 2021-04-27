@@ -10,7 +10,8 @@ const routes = [
       { path: AppRoutes.PROFILE.path, component: ()=> import('pages/Profile.vue') , meta: { requiresAuth: true }},
       { path: AppRoutes.MY_TRAVELS.path, component: ()=> import('pages/ListMyTravels.vue'), meta: { requiresAuth: true } },
       { path: AppRoutes.MY_TRAVELS.path+'/:travelId', component: ()=> import('pages/MyTravelsForm'), meta: { requiresAuth: true }, props: true },
-      { path: AppRoutes.NEW_TRAVEL.path, component: ()=> import('pages/MyTravelsForm'), meta: { requiresAuth: true }}
+      { path: AppRoutes.NEW_TRAVEL.path, component: ()=> import('pages/MyTravelsForm'), meta: { requiresAuth: true }},
+      { path: AppRoutes.LIKED_TRAVEL.path, component: ()=> import('pages/LikedTravels'), meta: { requiresAuth: true }}
 
     ]
   },

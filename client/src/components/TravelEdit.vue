@@ -119,30 +119,30 @@ export default {
     this.client = this.$axios.buildAuth(this.token);
     this.getTravel(this.travelId)
   },
-    watch: {
-      travelId: {
-        handler: function (nv) {
-          this.getTravel(nv)
-        }
+  watch: {
+    travelId: {
+      handler: function (nv) {
+        this.getTravel(nv)
       }
-    },
+    }
+  },
   computed: {
     undo() {
       return AppRoutes.MY_TRAVELS.path;
     }
   },
   methods: {
-    getTravel(tid) {
-      console.log(`travelId: ${tid}`)
+    async getTravel(tid) {
       if (tid) {
         this.loading = true
-        console.log('invoke client')
-        this.client.get(`/auth/travels/${tid}`)
-          .then(res => {
-            this.travel = res.data
-          })
-          .catch(() => this.$notifier.error('Unable to find your travel'))
-          .finally(()=>this.loading = false)
+        try {
+          const res = await this.client.get(`/auth/travels/${tid}`)
+          this.travel = res.data
+        }catch (e) {
+          this.$notifier.error('Unable to find your travel')
+        } finally {
+          this.loading = false
+        }
       }
     },
     async save() {
@@ -165,11 +165,8 @@ export default {
           try {
             // generate pre-signed URL for authenticated user
             const s3res = await this.client.post(`/auth/travels/${res.data.travelId}/attachment`)
-            console.log('Pre-signed-url: ', JSON.stringify(s3res))
             // put image to S3
-            const uploadState = await this.$axios.build({timeout: 5000}).put(s3res.data.uploadUrl, this.image)
-            console.log('Upload state: ', JSON.stringify(uploadState))
-            this.imageUrl = s3res.data.uploadUrl.split('?')[0]
+            await this.$axios.build({timeout: 5000}).put(s3res.data.uploadUrl, this.image)
           } catch (e) {
             this.$notifier.error('Error uploading image')
           }
@@ -192,7 +189,7 @@ export default {
       setTimeout(()=> {
         self.loading = false
         self.$router.push(AppRoutes.MY_TRAVELS.path)
-      }, 1000)
+      }, 2000)
     }
   }
 }

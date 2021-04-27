@@ -1,7 +1,8 @@
-# Travel Blog
+# Travel Blog (server)
 This is the final project for the Cloud Developer course.
 
-The project implement a Travel Blog portal, where every traveler ca share his travel experiences with each others.
+The project implement a Travel Blog website, 
+where every traveler can share his travel experiences with each others.
 
 This project use the following AWS services:
 - AWS X-RAY: to trace operatione

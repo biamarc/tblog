@@ -1,8 +1,8 @@
-# Travel Blog
+# Traveler Blog
 
 This is the final project for the Cloud Developer course.
 
-The project implement a simple blog where traveler can share their experience.
+The project implement a simple blog where travelers can share their experiences.
 
 The project back-end is designed to be deployed on AWS by using
 [Serverless](https://www.serverless.com/) framework, while the front-end 

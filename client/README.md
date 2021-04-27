@@ -1,6 +1,6 @@
-# Travel Blog (client)
+# Traveler Blog (client)
 
-This is a SPA used to connect to server components of blog.
+This is SPA used to connect to server components of blog.
 
 ## Install the dependencies
 ```bash

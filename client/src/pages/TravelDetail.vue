@@ -2,8 +2,10 @@
   <q-page padding>
     <tb-title-page icon="travel_explore" title="Detail">
     </tb-title-page>
-    <tb-travel-view :travel="travel" :limit="new Number(-1)">
-        <q-btn color="red" v-if="isLogged && liked.travelId" icon="clear" @click="deleteLike()" :loading="loading" class="q-mx-sm q-px-sm"/>
+    <tb-travel-view :travel="travel" :limit="-1">
+        <q-btn color="red" v-if="isLogged && liked.travelId" icon="clear" @click="deleteLike()" :loading="loading" class="q-mx-sm q-px-sm">
+          <q-tooltip :delay="500" >Remove your vote</q-tooltip>
+        </q-btn>
         <q-btn :disable="!isLogged" color="primary" icon="thumb_up" @click="like(true)" :loading="loading" class="q-mx-sm q-px-sm">
           <q-badge v-if="travel.like" outline color="default" :label="travel.like"/>
         </q-btn>
